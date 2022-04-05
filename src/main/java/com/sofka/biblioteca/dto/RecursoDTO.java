@@ -11,11 +11,10 @@ public class RecursoDTO {
     private String nombre;
     private Tipo tipoRecurso;
     private Tematica tematica;
-    private Boolean prestamo;
+    private Boolean prestamo = false;
     private String fechaPrestamo;
 
     public RecursoDTO() {
-        this.prestamo = false;
     }
 
     public RecursoDTO(String id, String nombre, Tipo tipoRecurso, Tematica tematica, Boolean prestamo, String fechaPrestamo) {

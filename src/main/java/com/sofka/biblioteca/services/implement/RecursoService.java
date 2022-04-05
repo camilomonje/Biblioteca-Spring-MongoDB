@@ -59,7 +59,7 @@ public class RecursoService implements IRecursoService {
     @Override
     public String availability(String nombre) {
         List<Recurso> recursos = repository.findByNombre(nombre);
-        if(recursos.size() <= 0) throw new RuntimeException("Recurso no Encontrado");
+        if(recursos.size() < 0) throw new RuntimeException("Recurso no Encontrado");
         if (recursos.stream().filter(recurso -> !recurso.isPrestamo()).count() > 0) {
             return String.format("El recurso %s esta disponible", nombre);
         }

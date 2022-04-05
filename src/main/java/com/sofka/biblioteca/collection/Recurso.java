@@ -16,11 +16,10 @@ public class Recurso {
     private String nombre;
     private Tipo tipoRecurso;
     private Tematica tematica;
-    private Boolean prestamo;
+    private Boolean prestamo = false;
     private String fechaPrestamo;
 
     public Recurso() {
-        this.prestamo = false;
     }
 
     public Recurso(String id, String nombre, Tipo tipoRecurso, Tematica tematica, Boolean prestamo, String fechaPrestamo) {
