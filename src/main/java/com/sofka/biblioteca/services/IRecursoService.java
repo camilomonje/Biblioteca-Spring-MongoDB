@@ -11,5 +11,6 @@ public interface IRecursoService {
     List<RecursoDTO> findAll();
     void delete(String id);
     RecursoDTO update(RecursoDTO recursoDTO);
+    String availability(String nombre);
 
 }

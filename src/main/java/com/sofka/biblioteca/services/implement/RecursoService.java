@@ -8,7 +8,10 @@ import com.sofka.biblioteca.services.IRecursoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class RecursoService implements IRecursoService {
 
@@ -47,5 +50,20 @@ public class RecursoService implements IRecursoService {
         repository.findById(recurso.getId())
                 .orElseThrow(() -> new RuntimeException("No se encuentra el recurso"));
         return mapper.fromDoc(repository.save(recurso));
+    }
+
+    @Override
+    public String availability(String nombre) {
+        List<Recurso> recursos = repository.findByNombre(nombre);
+        if(recursos.size() <= 0) throw new RuntimeException("Recurso no Encontrado");
+        if (recursos.stream().filter(recurso -> !recurso.isPrestamo()).count() > 0) {
+            return String.format("El recurso %s esta disponible", nombre);
+        }
+        var ultimoRecurso = recursos.stream()
+                .filter(recurso -> recurso.isPrestamo())
+                .sorted(Comparator.comparing(Recurso::getFechaPrestamo))
+                .collect(Collectors.toList()).get(0);
+        return String.format("El recurso %s con id %s NO esta disponible.\n Se presto en la fecha %s"
+                , ultimoRecurso.getNombre(), ultimoRecurso.getId(), ultimoRecurso.getFechaPrestamo());
     }
 }
