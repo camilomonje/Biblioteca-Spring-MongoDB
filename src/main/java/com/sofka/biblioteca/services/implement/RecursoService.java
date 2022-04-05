@@ -5,9 +5,13 @@ import com.sofka.biblioteca.dto.RecursoDTO;
 import com.sofka.biblioteca.mapper.Mapper;
 import com.sofka.biblioteca.repository.IRecursoRepository;
 import com.sofka.biblioteca.services.IRecursoService;
+import com.sofka.biblioteca.utils.Tematica;
+import com.sofka.biblioteca.utils.Tipo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,5 +69,36 @@ public class RecursoService implements IRecursoService {
                 .collect(Collectors.toList()).get(0);
         return String.format("El recurso %s con id %s NO esta disponible.\n Se presto en la fecha %s"
                 , ultimoRecurso.getNombre(), ultimoRecurso.getId(), ultimoRecurso.getFechaPrestamo());
+    }
+
+    @Override
+    public String prestar(String id) {
+        Recurso recurso = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encuentra el recurso"));
+        if (!recurso.isPrestamo()){
+            recurso.setPrestamo(true);
+            recurso.setFechaPrestamo(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            save(mapper.fromDoc(recurso));
+            return String.format("Se presta el recurso con id %s.", id);
+        }
+        return String.format("El recurso con id %s ya esta prestado", id);
+    }
+    @Override
+    public List<RecursoDTO> recomendar(Tematica tematica, Tipo tipo){
+        return findAll().stream()
+                .filter(recursoDTO -> recursoDTO.getTipoRecurso().equals(tipo) || recursoDTO.getTematica().equals(tematica))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String devolverRecurso(String id) {
+        Recurso recurso = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("No se encuentra el recurso"));
+        if (recurso.isPrestamo()){
+            recurso.setPrestamo(false);
+            save(mapper.fromDoc(recurso));
+            return String.format("Se retorna a la biblioteca el recurso con id %s.", id);
+        }
+        return String.format("El recurso con id %s ya esta en la biblioteca.", id);
     }
 }
